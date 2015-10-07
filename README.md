@@ -16,4 +16,4 @@
 | Feature |	Method	| Request URL | Todo Status | Date (yymmdd) |
 | :------------ |	:-------:	| :-----------------| :--------: | :----: |
 | TEST |	POST	| /antenna/test/connect | complete | 15-10-03  |
-| USER Join |	POST	| /antenna/test/connect | complete | 15-10-03  |
+| USER Join |	POST	| /antenna/user | complete | 15-10-08  |
