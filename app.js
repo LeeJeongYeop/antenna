@@ -18,7 +18,7 @@ require('./routes/api').initApp(app);
 
 // Server set
 var http = require('http');
-app.set('port', 30004); //30004¹ø Æ÷Æ®·Î ÁöÁ¤
+app.set('port', 30004); //30004ë²ˆ í¬íŠ¸ë¡œ ì§€ì •
 var server = http.createServer(app);
 server.listen(app.get('port'));
 log.info('[MusicFriends] Application Listening on Port 30004 (80 with Nginx Proxy)');
