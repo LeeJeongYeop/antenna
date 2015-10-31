@@ -66,10 +66,10 @@ exports.join = function(user_data, done){
                                     }
                                 });
                             },
-                            function(count, callback){  // 데이터 입력
+                            function(count, callback){  // 회원 데이터 입력
                                 user_data.user_freq = frequencyCreate(user_data.user_freq, count);
                                 var sql = "INSERT INTO atn_user SET ?";
-                                pool.query(sql, user_data, function(err, rows){
+                                conn.query(sql, user_data, function(err, rows){
                                     if(err){
                                         logger.error("User join waterfall_5");
                                         callback(err);
@@ -78,6 +78,25 @@ exports.join = function(user_data, done){
                                             callback(null, user_data.user_freq);
                                         }else{
                                             logger.error("User join waterfall_6");
+                                            conn.rollback(function(){
+                                                done(false, "User join DB error");
+                                                conn.release();
+                                            });
+                                        }
+                                    }
+                                });
+                            },
+                            function(user_freg, callback){  // 노래 데이터 입력
+                                var sql = "INSERT INTO atn_song(song_song, song_video, song_comment) VALUES (?,?,?)";
+                                conn.query(sql, [user_data.user_song, user_data.user_video, user_data.user_comment], function(err, rows){
+                                    if(err){
+                                        logger.error("User join waterfall_7");
+                                        callback(err);
+                                    }else{
+                                        if(rows.affectedRows == 1){
+                                            callback(null, user_freg);
+                                        }else{
+                                            logger.error("User join waterfall_8");
                                             conn.rollback(function(){
                                                 done(false, "User join DB error");
                                                 conn.release();

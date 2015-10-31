@@ -9,7 +9,7 @@ var async = require('async');
  *  USER Join
  ********************/
 exports.join = function(req, res){
-    if(!req.body.survey || !req.body.song || !req.body.video){  // parameter check
+    if(!req.body.survey || !req.body.song || !req.body.video || !req.body.nickname){  // parameter check
         return res.json({
             "status": false,
             "message": "invalid parameter"
@@ -19,6 +19,7 @@ exports.join = function(req, res){
             "user_freq": req.body.survey,
             "user_song": req.body.song,
             "user_video": req.body.video,
+            "user_nickname": req.body.nickname,
             "user_comment": req.body.comment
         };
         userModel.join(user_data, function(status, msg, user_freq){
