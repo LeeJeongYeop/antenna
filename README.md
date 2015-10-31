@@ -17,3 +17,4 @@
 | :------------ |	:-------:	| :-----------------| :--------: | :----: |
 | TEST |	POST	| /antenna/test/connect | complete | 15-10-03  |
 | USER Join |	POST	| /antenna/user | complete | 15-10-08  |
+| Estimate Song |	GET	| /antenna/estimate | complete | 15-10-31  |

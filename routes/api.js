@@ -3,13 +3,18 @@
  */
 var test = require('../controllers/test');
 var userCtrl = require('../controllers/userCtrl');
+var estiCtrl = require('../controllers/estiCtrl');
 
 exports.initApp = function(app){
-    //TEST
+    // TEST
     app.route('/antenna/test/connect')
         .get(test.connect);
 
-    //USER
+    // USER
     app.route('/antenna/user')
         .post(userCtrl.join);
+
+    // Estimate
+    app.route('/antenna/estimate')
+        .get(estiCtrl.estiSong);
 };
