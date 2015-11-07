@@ -16,5 +16,6 @@ exports.initApp = function(app){
 
     // Estimate
     app.route('/antenna/estimate')
-        .get(estiCtrl.estiSong);
+        .get(estiCtrl.estiSong)
+        .post(estiCtrl.estiResult);
 };

@@ -17,6 +17,7 @@
     "morgan": "~1.6.1",
     "mysql": "^2.8.0",
     "serve-favicon": "~2.3.0",
+    "simple-encryptor": "^1.0.3",
     "winston": "^1.0.1"
   }
 }
