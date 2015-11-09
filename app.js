@@ -18,7 +18,7 @@ require('./routes/api').initApp(app);
 
 // Server set
 var http = require('http');
-app.set('port', 30005); //30004번 포트로 지정
+app.set('port', 30004); //30004번 포트로 지정
 var server = http.createServer(app);
 server.listen(app.get('port'));
 log.info('[Antenna] Application Listening on Port 30004 (80 with Nginx Proxy)');
