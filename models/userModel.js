@@ -68,8 +68,16 @@ exports.join = function(user_data, done){
                             },
                             function(count, callback){  // 회원 데이터 입력
                                 user_data.user_freq = frequencyCreate(user_data.user_freq, count);
-                                var sql = "INSERT INTO atn_user SET ?";
-                                conn.query(sql, user_data, function(err, rows){
+                                var sql =
+                                    "UPDATE atn_user " +
+                                    "SET user_freq=?, user_song=?, user_video=?, user_nickname=?, user_comment=? " +
+                                    "WHERE user_idx = ?";
+                                var update_user = [];
+                                for (var key in user_data){
+                                    update_user.push(user_data[key]);
+                                }
+                                logger.info("update_user:", update_user);
+                                conn.query(sql, update_user, function(err, rows){
                                     if(err){
                                         logger.error("User join waterfall_5");
                                         callback(err);
