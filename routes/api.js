@@ -14,8 +14,10 @@ exports.initApp = function(app){
     app.route('/antenna/user')
         .post(userCtrl.join);
 
-    // Estimate
+    // ESTIMATE
     app.route('/antenna/estimate')
-        .get(estiCtrl.estiSong)
-        .post(estiCtrl.estiResult);
+        .get(estiCtrl.estiSongList)
+        .post(estiCtrl.estiSongResult);
+    app.route('/antenna/estimate/result')
+        .get(estiCtrl.estiResult);
 };

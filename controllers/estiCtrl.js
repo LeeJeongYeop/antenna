@@ -9,7 +9,7 @@ var async = require('async');
 /*******************
  *  Estimate Song List
  ********************/
-exports.estiSong = function(req, res){
+exports.estiSongList = function(req, res){
     estiModel.estiSong(function(status, msg, song){
         if(!status){
             song = null;
@@ -27,7 +27,7 @@ exports.estiSong = function(req, res){
 /*******************
  *  Estimate Song Result
  ********************/
-exports.estiResult = function(req, res){
+exports.estiSongResult = function(req, res){
     if(!req.body.song_idx || !req.body.estimate){  // parameter check
         return res.json({
             "status": false,
@@ -39,7 +39,7 @@ exports.estiResult = function(req, res){
             "esti_esti": req.body.estimate
         };
         if(!req.body.uid){  // 완전 첫 유저의 경우
-            estiModel.estiResultFirst(data, function(status, msg, uid){
+            estiModel.estiResultSongFirst(data, function(status, msg, uid){
                 if(!uid){
                     uid = null;
                 }
@@ -53,12 +53,23 @@ exports.estiResult = function(req, res){
             });
         }else{  // user_idx를 받은 유저
             data.esti_user = _cryptor.decrypted(req.body.uid);  // 객체에 esti_user 추가
-            estiModel.estiResult(data, function(status, msg){
+            estiModel.estiResultSong(data, function(status, msg){
                 return res.json({
                     "status": status,
                     "message": msg
                 });
             });
         }
+    }
+};
+
+exports.estiResult = function(req, res){
+    if(!req.body.uid){  // parameter check
+        return res.json({
+            "status": false,
+            "message": "invalid parameter"
+        });
+    }else{
+
     }
 };

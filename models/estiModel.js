@@ -10,7 +10,7 @@ var async = require('async');
 /*******************
  *  Estimate Song List
  ********************/
-exports.estiSong = function(done){
+exports.estiSongList = function(done){
     var sql =
         "SELECT DISTINCT(song_idx) song_idx, song_song, song_video, song_comment " +
         "FROM atn_song " +
@@ -33,7 +33,7 @@ exports.estiSong = function(done){
 /*******************
  *  Estimate Song Result
  ********************/
-exports.estiResultFirst = function(data, done){
+exports.estiResultSongFirst = function(data, done){
     pool.getConnection(function(err, conn){
         if(err){
             logger.error("Estimate Result First getConnection error:", err);
@@ -113,7 +113,7 @@ exports.estiResultFirst = function(data, done){
     });
 };
 
-exports.estiResult = function(data, done){
+exports.estiResultSong = function(data, done){
     var sql = "INSERT INTO atn_esti SET ?";
     pool.query(sql, data, function(err, rows){
         if(err){
@@ -128,4 +128,11 @@ exports.estiResult = function(data, done){
             }
         }
     });
+};
+
+/*******************
+ *  Estimate Result
+ ********************/
+exprots.estiResult = function(data, done){
+
 };
