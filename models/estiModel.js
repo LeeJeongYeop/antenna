@@ -114,25 +114,79 @@ exports.estiResultSongFirst = function(data, done){
 };
 
 exports.estiResultSong = function(data, done){
-    var sql = "INSERT INTO atn_esti SET ?";
-    pool.query(sql, data, function(err, rows){
-        if(err){
-            logger.error("Estimate Result Error_1:", err);
-            done(false, "Estimate Result Error");
-        }else{
-            if(rows.affectedRows != 1){
-                logger.error("Estimate Result Error_2");
+    async.waterfall([
+            function(callback){
+                var sql = "SELECT * FROM atn_esti WHERE esti_user=? AND esti_song=?";
+                pool.query(sql, [data.esti_user, data.esti_song], function(err, rows){
+                    if(err){
+                        logger.error("Estimate Result Waterfall Error_1:", err);
+                        callback(err);
+                    }else{
+                        callback(null, rows);
+                    }
+                });
+            },
+            function(flag, callback){
+                logger.info("flag:",flag);
+                if(flag.length == 0){  // 평가하지 않은 곡
+                    var insert_sql = "INSERT INTO atn_esti SET ?";
+                    pool.query(insert_sql, data, function(err, rows){
+                        if(err){
+                            logger.error("Estimate Result Waterfall Error_2:", err);
+                            callback(err);
+                        }else{
+                            if(rows.affectedRows != 1){
+                                logger.error("Estimate Result Waterfall Error_3");
+                                done(false, "Estimate Result DB Error");  // callback 없이 done
+                            }else{
+                                callback(null);
+                            }
+                        }
+                    });
+                }else{  // 이미 평가한곡
+                    var update_sql = "UPDATE atn_esti SET esti_esti=? WHERE esti_user=?  AND esti_song=?";
+                    pool.query(update_sql, [data.esti_esti, data.esti_user, data.esti_song], function(err, rows){
+                        if(err){
+                            logger.error("Estimate Result Waterfall Error_4:", err);
+                            callback(err);
+                        }else{
+                            if(rows.affectedRows != 1){
+                                logger.error("Estimate Result Waterfall Error_5");
+                                done(false, "Estimate Result DB Error");  // callback 없이 done
+                            }else{
+                                callback(null);
+                            }
+                        }
+                    });
+                }
+            }
+        ],
+        function(err){
+            if(err){
                 done(false, "Estimate Result Error");
             }else{
                 done(true, "success");
             }
         }
-    });
+    );
 };
 
 /*******************
  *  Estimate Result
  ********************/
-exprots.estiResult = function(data, done){
-
+exports.myEstimate = function(uid, done){
+    var sql = "SELECT esti_song, esti_esti FROM atn_esti WHERE esti_user = ?";
+    pool.query(sql, uid, function(err, rows){
+        if(err){
+            logger.error("My Estimate List error:", err);
+            done(false, "My Estimate List error");
+        }else{
+            if(rows.length == 0){
+                logger.error("No My Estimate List Data");
+                done(false, "No My Estimate List Data");
+            }else{
+                done(true, "success", rows);
+            }
+        }
+    });
 };

@@ -10,7 +10,7 @@ var async = require('async');
  *  Estimate Song List
  ********************/
 exports.estiSongList = function(req, res){
-    estiModel.estiSong(function(status, msg, song){
+    estiModel.estiSongList(function(status, msg, song){
         if(!status){
             song = null;
         }
@@ -70,6 +70,15 @@ exports.estiResult = function(req, res){
             "message": "invalid parameter"
         });
     }else{
-
+        var uid = _cryptor.decrypted(req.body.uid);
+        estiModel.myEstimate(uid, function(status, msg, my_list){
+            return res.json({
+                "status": status,
+                "message": msg,
+                "data": {
+                    "my_list": my_list
+                }
+            });
+        });
     }
 };
