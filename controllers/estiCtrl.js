@@ -195,8 +195,7 @@ exports.estiMatch = function(req, res){
                         }else{
                             var data = [];
                             for (var i in recommend_song){  // 매칭 데이터
-                                data[i] = [];
-                                data[i].push([uid, other_idx, recommend_song[i]]);
+                                data[i] = [uid, other_idx, recommend_song[i]];
                             }
                             estiModel.matchInsert(uid, other_idx, data, function(status, msg){
                                 if(status){

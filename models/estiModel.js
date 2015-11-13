@@ -239,9 +239,9 @@ exports.matchInsert = function(uid, other_idx, data, done){
                                 });
                             },
                             function(callback){
-                                var sql = "INSERT INTO atn_match(match_my, match_other, match_song) VALUE ?";
-                                logger.info(data);
-                                conn.query(sql, data, function(err, rows){
+                                var sql = "INSERT INTO atn_match(match_my, match_other, match_song) VALUES ?";
+                                logger.info("data:", [data]);
+                                conn.query(sql, [data], function(err, rows){
                                     if(err){
                                         logger.error("Match Insert waterfall_3:", err);
                                         callback(err);
