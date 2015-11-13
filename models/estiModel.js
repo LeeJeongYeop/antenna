@@ -172,21 +172,115 @@ exports.estiResultSong = function(data, done){
 };
 
 /*******************
- *  Estimate Result
+ *  Estimate Match
  ********************/
-exports.myEstimate = function(uid, done){
+exports.estimate = function(uid, done){
     var sql = "SELECT esti_song, esti_esti FROM atn_esti WHERE esti_user = ?";
     pool.query(sql, uid, function(err, rows){
         if(err){
-            logger.error("My Estimate List error:", err);
-            done(false, "My Estimate List error");
+            logger.error("Estimate error:", err);
+            done(err);
         }else{
             if(rows.length == 0){
-                logger.error("No My Estimate List Data");
-                done(false, "No My Estimate List Data");
+                logger.error("No Estimate Data");
+                done("No Estimate Data");  // my error code
             }else{
-                done(true, "success", rows);
+                done(null, rows);
             }
+        }
+    });
+};
+exports.otherList = function(done){
+    var sql = "SELECT user_idx, user_freq FROM atn_user WHERE user_freq IS NOT NULL";
+    pool.query(sql, function(err, rows){
+        if(err){
+            logger.error("Other List error:", err);
+            done(err);
+        }else{
+            if(rows.length == 0){
+                logger.error("Other List No user");
+                done("Other List No user");  // my error code
+            }else{
+                done(null, rows);
+            }
+        }
+    });
+};
+exports.matchInsert = function(uid, other_idx, data, done){
+    pool.getConnection(function(err, conn){
+        if(err){
+            logger.error("Match Insert getConnection error:", err);
+            done(false, "Match Insert getConnection error");
+        }else{
+            conn.beginTransaction(function(err){
+                if(err){
+                    logger.error("Match Insert beginTransaction error:", err);
+                    done(false, "Match Insert beginTransaction error");
+                    conn.release();
+                }else{
+                    async.waterfall([
+                            function(callback){
+                                var sql = "Update atn_user SET user_partner=? WHERE user_idx=?";
+                                conn.query(sql, [other_idx, uid], function(err, rows){
+                                    if(err){
+                                        logger.error("Match Insert waterfall_1:", err);
+                                        callback(err);
+                                    }else{
+                                        if(rows.affectedRows != 1){
+                                            logger.error("Match Insert waterfall_2: no data");
+                                            conn.rollback(function(){
+                                                done(false, "Match Insert DB Error");  // error done callback
+                                                conn.release();
+                                            });
+                                        }else{
+                                            callback(null);
+                                        }
+                                    }
+                                });
+                            },
+                            function(callback){
+                                var sql = "INSERT INTO atn_match(match_my, match_other, match_song) VALUE ?";
+                                logger.info(data);
+                                conn.query(sql, data, function(err, rows){
+                                    if(err){
+                                        logger.error("Match Insert waterfall_3:", err);
+                                        callback(err);
+                                    }else{
+                                        if(rows.affectedRows == 0){
+                                            conn.rollback(function(){
+                                                logger.error("Match Insert waterfall_4");
+                                                done(false, "Match Insert DB Error");  // error done callback
+                                                conn.release();
+                                            });
+                                        }else{
+                                            callback(null);
+                                        }
+                                    }
+                                });
+                            }
+                        ],
+                        function(err){
+                            if(err){
+                                conn.rollback(function(){
+                                    done(false, "Match Insert DB Error");  // error
+                                    conn.release();
+                                });
+                            }else{
+                                conn.commit(function(err){
+                                    if(err){
+                                        logger.error("Match Insert Commit Error:", err);
+                                        done(false, "Match Insert Commit Error");  // error
+                                        conn.release();
+                                    }else{
+                                        done(true, "success");  // success
+                                        conn.release();
+                                    }
+                                });
+                            }
+                        }
+                    );  // waterfall
+                }
+            });  // beginTransaction
         }
     });
 };

@@ -18,6 +18,6 @@ exports.initApp = function(app){
     app.route('/antenna/estimate')
         .get(estiCtrl.estiSongList)
         .post(estiCtrl.estiSongResult);
-    app.route('/antenna/estimate/result')
-        .post(estiCtrl.estiResult);
+    app.route('/antenna/estimate/match')
+        .post(estiCtrl.estiMatch);
 };
