@@ -205,7 +205,7 @@ exports.estiMatch = function(req, res){
                                         "message": msg,
                                         "data": {
                                             "frequency": (recommend_user / 1000),
-                                            "song": recommend_song
+                                            "song": recommend_song.length
                                         }
                                     });
                                 }else{
