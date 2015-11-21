@@ -20,3 +20,4 @@
 | Estimate Song List |	GET	| /antenna/estimate | complete | 15-10-31  |
 | Estimate Song Result |	POST	| /antenna/estimate | complete | 15-11-08  |
 | Estimate Match |	POST	| /antenna/estimate/match | complete | 15-11-13  |
+| Estimate Detail |	GET	| /antenna/estimate/match | complete | 15-11-22  |

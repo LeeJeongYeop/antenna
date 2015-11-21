@@ -12,16 +12,17 @@ var async = require('async');
  ********************/
 exports.estiSongList = function(done){
     var sql =
-        "SELECT DISTINCT(song_idx) song_idx, song_song, song_video, song_comment " +
-        "FROM atn_song " +
+        "SELECT DISTINCT(song_idx) song_idx, s.song_song, s.song_video, s.song_comment, u.user_freq, u.user_nickname " +
+        "FROM atn_song s, atn_user u " +
+        "WHERE s.song_user = u.user_idx " +
         "ORDER BY RAND() LIMIT 10";  // 10곡
     pool.query(sql, function(err, rows){
         if(err){
-            logger.error("Estimate Song Send waterfall_1: ", err);
+            logger.error("Estimate Song Send Error: ", err);
             done(false, "Estimate Song Send Error");
         }else{
             if(rows.length == 0){
-                logger.error("Estimate Song Send waterfall_2: no data");
+                logger.error("Estimate Song Send no data");
                 done(false, "Estimate Song Send Error");  // done callback
             }else{
                 done(true, "success", rows);
@@ -191,7 +192,7 @@ exports.estimate = function(uid, done){
     });
 };
 exports.otherList = function(done){
-    var sql = "SELECT user_idx, user_freq FROM atn_user WHERE user_freq IS NOT NULL";
+    var sql = "SELECT user_idx, user_freq FROM atn_user WHERE user_freq IS NOT NULL AND user_idx != 21";  // 21은 운영자
     pool.query(sql, function(err, rows){
         if(err){
             logger.error("Other List error:", err);
@@ -283,4 +284,109 @@ exports.matchInsert = function(uid, other_idx, data, done){
             });  // beginTransaction
         }
     });
+};
+
+/*******************
+ *  Estimate Detail
+ ********************/
+exports.estiDetail = function(data, done){
+    async.waterfall([
+            function(callback){
+                var sql = "SELECT user_partner FROM atn_user WHERE user_idx = ?";
+                pool.query(sql, data, function(err, rows){
+                    if(err){
+                        logger.error("Estimate Detail waterfall_1: ", err);
+                        callback(err);
+                    }else{
+                        if(rows.length == 0){
+                            logger.error("No Estimate Detail Data_1");
+                            done(false, "No Estimate Detail Data_1");  // my error code
+                        }else{
+                            callback(null, rows[0].user_partner);
+                        }
+                    }
+                });
+            },
+            function(partner_idx, callback){
+                logger.info("partner_idx:", partner_idx);
+                var sql =
+                    "SELECT user_freq, user_song, user_video, user_nickname, user_comment " +
+                    "FROM atn_user " +
+                    "WHERE user_idx = ?";
+                pool.query(sql, partner_idx, function(err, rows){
+                    if(err){
+                        logger.error("Estimate Detail waterfall_2: ", err);
+                        callback(err);
+                    }else{
+                        if(rows.length == 0){
+                            logger.error("No Estimate Detail Data_2");
+                            done(false, "No Estimate Detail Data_2");  // my error code
+                        }else{
+                            callback(null, rows[0], partner_idx);
+                        }
+                    }
+                });
+            },
+            function(partner, partner_idx, callback){
+                logger.info("partner:", partner);
+                var sql = "SELECT match_song FROM atn_match WHERE match_my = ? AND match_other = ?";
+                pool.query(sql, [data, partner_idx], function(err, rows){
+                    if(err){
+                        logger.error("Estimate Detail waterfall_3: ", err);
+                        callback(err);
+                    }else{
+                        if(rows.length == 0){
+                            logger.error("No Estimate Detail Data_3");
+                            done(false, "No Estimate Detail Data_3");  // my error code
+                        }else{
+                            var song = [];
+                            var song_sql =
+                                "SELECT song_song, song_video, song_comment " +
+                                "FROM atn_song " +
+                                "WHERE song_idx = ?";
+                            async.each(rows, function(song_check, each_cb){
+                                    logger.info("song_check:", song_check);
+                                    var like_check = 1;
+                                    var song_idx = song_check.match_song;
+                                    if(song_check.match_song < 0){
+                                        song_idx = song_idx * -1;
+                                        like_check = -1;
+                                    }
+                                    pool.query(song_sql, song_idx, function(err, rows){
+                                        if(err){
+                                            logger.error("Estimate Detail Each Error:", err);
+                                            each_cb(err);
+                                        }else{
+                                            logger.info("songs:", rows[0]);
+                                            song.push({
+                                                "song": rows[0].song_song,
+                                                "video": rows[0].song_video,
+                                                "comment": rows[0].song_comment,
+                                                "like": like_check
+                                            });
+                                            each_cb();
+                                        }
+                                    });
+                                },
+                                function(err){
+                                    if(err){
+                                        callback(err);
+                                    }else{
+                                        callback(null, song, partner);
+                                    }
+                                }
+                            );  // each
+                        }
+                    }
+                });
+            }
+        ],
+        function(err, song, partner){
+            if(err){
+                done(false, "Estimate Detail Error");
+            }else{
+                done(true, "success", song, partner);
+            }
+        }
+    );  // waterfall
 };

@@ -9,7 +9,9 @@ var async = require('async');
 
 // 주파수 생성
 var frequencyCreate = function(area, count){
-    return ((area * 100000) + count);
+    var number = ((area * 100000) + count);
+    var freq = (number/1000);
+    return freq.toFixed(3);
 };
 
 /*******************
@@ -94,15 +96,15 @@ exports.join = function(user_data, done){
                                     }
                                 });
                             },
-                            function(user_freg, callback){  // 노래 데이터 입력
-                                var sql = "INSERT INTO atn_song(song_song, song_video, song_comment) VALUES (?,?,?)";
-                                conn.query(sql, [user_data.user_song, user_data.user_video, user_data.user_comment], function(err, rows){
+                            function(user_freq, callback){  // 노래 데이터 입력
+                                var sql = "INSERT INTO atn_song(song_song, song_video, song_comment, song_user) VALUES (?,?,?,?)";
+                                conn.query(sql, [user_data.user_song, user_data.user_video, user_data.user_comment, user_data.user_idx], function(err, rows){
                                     if(err){
                                         logger.error("User join waterfall_7");
                                         callback(err);
                                     }else{
                                         if(rows.affectedRows == 1){
-                                            callback(null, user_freg);
+                                            callback(null, user_freq);
                                         }else{
                                             logger.error("User join waterfall_8");
                                             conn.rollback(function(){
@@ -127,7 +129,6 @@ exports.join = function(user_data, done){
                                         done(false, "User join DB error");
                                         conn.release();
                                     }else{
-                                        user_freq = (user_freq / 1000);  // 주파수 상태로 보여주기
                                         done(true, "success", user_freq);  // success
                                         conn.release();
                                     }

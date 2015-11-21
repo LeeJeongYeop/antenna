@@ -20,4 +20,6 @@ exports.initApp = function(app){
         .post(estiCtrl.estiSongResult);
     app.route('/antenna/estimate/match')
         .post(estiCtrl.estiMatch);
+    app.route('/antenna/estimate/detail')
+        .get(estiCtrl.estiDetail);
 };

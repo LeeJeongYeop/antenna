@@ -17,7 +17,7 @@ var shuffle = function(array){
 // recommend user
 var recommend = function(my_array, other_list, recommend_cb){
     var cnt = 0;
-    var recommend_user = 0,
+    var recommend_user = "",
         recommend_song = [],
         other_idx = 0;
     async.whilst(
@@ -203,7 +203,7 @@ exports.estiMatch = function(req, res){
                                         "status": true,
                                         "message": msg,
                                         "data": {
-                                            "frequency": (recommend_user / 1000),
+                                            "frequency": recommend_user,
                                             "song": recommend_song.length
                                         }
                                     });
@@ -219,5 +219,33 @@ exports.estiMatch = function(req, res){
                 }
             }
         );  // parallel
+    }
+};
+
+/*******************
+ *  Estimate Detail
+ ********************/
+exports.estiDetail = function(req, res){
+    logger.info("headers:", req.headers.uid);
+    if(!req.headers.uid){  // parameter check
+        return res.json({
+            "status": false,
+            "message": "invalid parameter"
+        });
+    }else{
+        estiModel.estiDetail(_cryptor.decrypted(req.headers.uid), function(status, msg, song, partner){
+            if(!status){
+                song = null;
+                partner = null;
+            }
+            return res.json({
+                "status": status,
+                "message": msg,
+                "data": {
+                    "song": song,
+                    "partner": partner
+                }
+            });
+        });
     }
 };
