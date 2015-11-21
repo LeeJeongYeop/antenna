@@ -4,6 +4,7 @@
 var test = require('../controllers/test');
 var userCtrl = require('../controllers/userCtrl');
 var estiCtrl = require('../controllers/estiCtrl');
+var bookmarkCtrl = require('../controllers/bookmarkCtrl');
 
 exports.initApp = function(app){
     // TEST
@@ -22,4 +23,8 @@ exports.initApp = function(app){
         .post(estiCtrl.estiMatch);
     app.route('/antenna/estimate/detail')
         .get(estiCtrl.estiDetail);
+
+    // BOOKMARK
+    app.route('/antenna/bookmark')
+        .post(bookmarkCtrl.bkAdd)
 };
