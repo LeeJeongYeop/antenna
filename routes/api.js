@@ -27,4 +27,5 @@ exports.initApp = function(app){
     // BOOKMARK
     app.route('/antenna/bookmark')
         .post(bookmarkCtrl.bkAdd)
+        .get(bookmarkCtrl.bkList)
 };

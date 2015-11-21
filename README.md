@@ -21,3 +21,5 @@
 | Estimate Song Result |	POST	| /antenna/estimate | complete | 15-11-08  |
 | Estimate Match |	POST	| /antenna/estimate/match | complete | 15-11-13  |
 | Estimate Detail |	GET	| /antenna/estimate/match | complete | 15-11-22  |
+| Bookmark Add |	POST	| /antenna/bookmark | complete | 15-11-22  |
+| Bookmark list |	GET	| /antenna/bookmark | complete | 15-11-22  |

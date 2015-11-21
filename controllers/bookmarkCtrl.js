@@ -53,3 +53,25 @@ exports.bkAdd = function(req, res){
         );  // waterfall
     }
 };
+
+/*******************
+ *  Bookmark List
+ ********************/
+exports.bkList = function(req, res){
+    if(!req.headers.uid){  // parameter check
+        return res.json({
+            "status": false,
+            "message": "invalid parameter"
+        });
+    }else{
+        bookmarkModel.bkList(_cryptor.decrypted(req.headers.uid), function(status, msg, list){
+            return res.json({
+                "status": status,
+                "message": msg,
+                "data": {
+                    "list": list
+                }
+            });
+        });
+    }
+};

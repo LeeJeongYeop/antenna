@@ -72,3 +72,21 @@ exports.bkAdd = function(data, done){
         }
     );  // waterfall
 };
+
+/*******************
+ *  Bookmark List
+ ********************/
+exports.bkList = function(data, done){
+    var sql =
+        "SELECT u.user_freq, u.user_nickname " +
+        "FROM atn_bookmark m, atn_user u " +
+        "WHERE m.bookmark_friend = u.user_idx AND m.bookmark_my = ?";
+    pool.query(sql, data, function(err, rows){
+        if(err){
+            logger.error("Bookmark List Error: ", err);
+            done(false, "Bookmark List Error");
+        }else{
+            done(true, "success", rows);
+        }
+    });
+};
