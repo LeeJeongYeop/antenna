@@ -2,7 +2,7 @@
  * Created by kingw on 2015-11-22.
  */
 var bookmarkModel = require('../models/bookmarkModel');
-var _cryptor = require('../my_conf');
+var my = require('../my_conf');
 var logger = require('../logger');
 var async = require('async');
 
@@ -28,7 +28,7 @@ exports.bkAdd = function(req, res){
                 },
                 function(bookmark, callback){
                     var data = {
-                        "bookmark_my": _cryptor.decrypted(req.headers.uid),
+                        "bookmark_my": my.decrypted(req.headers.uid),
                         "bookmark_friend": bookmark
                     };
                     bookmarkModel.bkAdd(data, function(err, msg){
@@ -64,7 +64,10 @@ exports.bkList = function(req, res){
             "message": "invalid parameter"
         });
     }else{
-        bookmarkModel.bkList(_cryptor.decrypted(req.headers.uid), function(status, msg, list){
+        bookmarkModel.bkList(my.decrypted(req.headers.uid), function(status, msg, list){
+            if(!status){
+                list = null;
+            }
             return res.json({
                 "status": status,
                 "message": msg,

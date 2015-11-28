@@ -191,9 +191,12 @@ exports.estimate = function(uid, done){
         }
     });
 };
-exports.otherList = function(done){
-    var sql = "SELECT user_idx, user_freq FROM atn_user WHERE user_freq IS NOT NULL AND user_idx != 21";  // 21은 운영자
-    pool.query(sql, function(err, rows){
+exports.otherList = function(uid, done){
+    var sql =
+        "SELECT user_idx, user_freq " +
+        "FROM atn_user " +
+        "WHERE user_freq IS NOT NULL AND user_idx != 21 AND user_idx != ?";  // 21은 운영자
+    pool.query(sql, uid, function(err, rows){
         if(err){
             logger.error("Other List error:", err);
             done(err);
@@ -240,24 +243,28 @@ exports.matchInsert = function(uid, other_idx, data, done){
                                 });
                             },
                             function(callback){
-                                var sql = "INSERT INTO atn_match(match_my, match_other, match_song) VALUES ?";
-                                logger.info("data:", [data]);
-                                conn.query(sql, [data], function(err, rows){
-                                    if(err){
-                                        logger.error("Match Insert waterfall_3:", err);
-                                        callback(err);
-                                    }else{
-                                        if(rows.affectedRows == 0){
-                                            conn.rollback(function(){
-                                                logger.error("Match Insert waterfall_4");
-                                                done(false, "Match Insert DB Error");  // error done callback
-                                                conn.release();
-                                            });
+                                if(data.length == 0){  // 매칭 곡이 아예 없을때
+                                    callback(null);
+                                }else{
+                                    var sql = "INSERT INTO atn_match(match_my, match_other, match_song) VALUES ?";
+                                    logger.info("data:", [data]);
+                                    conn.query(sql, [data], function(err, rows){
+                                        if(err){
+                                            logger.error("Match Insert waterfall_3:", err);
+                                            callback(err);
                                         }else{
-                                            callback(null);
+                                            if(rows.affectedRows == 0){
+                                                conn.rollback(function(){
+                                                    logger.error("Match Insert waterfall_4");
+                                                    done(false, "Match Insert DB Error");  // error done callback
+                                                    conn.release();
+                                                });
+                                            }else{
+                                                callback(null);
+                                            }
                                         }
-                                    }
-                                });
+                                    });
+                                }
                             }
                         ],
                         function(err){
@@ -389,4 +396,15 @@ exports.estiDetail = function(data, done){
             }
         }
     );  // waterfall
+};
+
+/*******************
+ *  Estimate Random
+ ********************/
+exports.estiRandom = function(uid, done){
+    var sql =
+        "SELECT user_idx, user_freq " +
+        "FROM atn_user " +
+        "WHERE user_freq IS NOT NULL AND user_idx != 21 AND user_idx != ? "+
+        "ORDER BY RAND() LIMIT 1";  // 10곡// 21은 운영자
 };

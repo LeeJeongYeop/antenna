@@ -22,4 +22,6 @@
 | Estimate Match |	POST	| /antenna/estimate/match | complete | 15-11-13  |
 | Estimate Detail |	GET	| /antenna/estimate/match | complete | 15-11-22  |
 | Bookmark Add |	POST	| /antenna/bookmark | complete | 15-11-22  |
-| Bookmark list |	GET	| /antenna/bookmark | complete | 15-11-22  |
+| Bookmark List |	GET	| /antenna/bookmark | complete | 15-11-22  |
+| Mail Send |	POST	| /antenna/mail | complete | 15-11-28  |
+| Mail View |	GET	| /antenna/mail/:mid | complete | 15-11-28  |

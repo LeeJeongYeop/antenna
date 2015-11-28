@@ -72,7 +72,8 @@ exports.join = function(user_data, done){
                                 user_data.user_freq = frequencyCreate(user_data.user_freq, count);
                                 var sql =
                                     "UPDATE atn_user " +
-                                    "SET user_freq=?, user_song=?, user_video=?, user_nickname=?, user_comment=? " +
+                                    "SET user_freq=?, user_song=?, user_video=?, user_nickname=?, " +
+                                    "user_comment=?, user_phone=?, user_regid=? " +
                                     "WHERE user_idx = ?";
                                 var update_user = [];
                                 for (var key in user_data){

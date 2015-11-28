@@ -2,7 +2,7 @@
  * Created by kingw on 2015-10-31.
  */
 var estiModel = require('../models/estiModel');
-var _cryptor = require('../my_conf');
+var my = require('../my_conf');
 var logger = require('../logger');
 var async = require('async');
 
@@ -44,12 +44,12 @@ var recommend = function(my_array, other_list, recommend_cb){
                     }
 
                     logger.info("result_array:", result_array);
-                    var STANDARD = 0.5;  // 추천 조건
+                    var STANDARD = 0;  // 추천 조건(원래 0.5)
                     if(result_array.length >= ((my_array.length) * STANDARD)){
                         recommend_user = other_list[cnt].user_freq;
                         recommend_song = result_array;
                         other_idx = other_list[cnt].user_idx;
-                        cnt = other_list.length;
+                        cnt = other_list.length;  // whilst 끝내기 조건
                         callback();
                     }else{
                         if(recommend_user == 0){  // 첫번째 비교 대상
@@ -126,12 +126,12 @@ exports.estiSongResult = function(req, res){
                     "status": status,
                     "message": msg,
                     "data": {
-                        "uid": _cryptor.encrypted(uid)
+                        "uid": my.encrypted(uid)
                     }
                 });
             });
         }else{  // user_idx를 받은 유저
-            data.esti_user = _cryptor.decrypted(req.body.uid);  // 객체에 esti_user 추가
+            data.esti_user = my.decrypted(req.body.uid);  // 객체에 esti_user 추가
             estiModel.estiResultSong(data, function(status, msg){
                 return res.json({
                     "status": status,
@@ -152,7 +152,7 @@ exports.estiMatch = function(req, res){
             "message": "invalid parameter"
         });
     }else{
-        var uid = _cryptor.decrypted(req.body.uid);
+        var uid = my.decrypted(req.body.uid);
         async.parallel({
                 my_array: function(callback){  // 자신의 평가 배열생성
                     var my_array = [];
@@ -168,7 +168,7 @@ exports.estiMatch = function(req, res){
                     });
                 },
                 other_list: function(callback){  // 주파수를 가진 사람들 리스트
-                    estiModel.otherList(function(err, other_list){
+                    estiModel.otherList(uid, function(err, other_list){
                         if(err){
                             callback(err);  // model에서 에러상황
                         }else{
@@ -233,7 +233,7 @@ exports.estiDetail = function(req, res){
             "message": "invalid parameter"
         });
     }else{
-        estiModel.estiDetail(_cryptor.decrypted(req.headers.uid), function(status, msg, song, partner){
+        estiModel.estiDetail(my.decrypted(req.headers.uid), function(status, msg, song, partner){
             if(!status){
                 song = null;
                 partner = null;
@@ -246,6 +246,22 @@ exports.estiDetail = function(req, res){
                     "partner": partner
                 }
             });
+        });
+    }
+};
+
+/*******************
+ *  Estimate Random
+ ********************/
+exports.estiRandom = function(req, res){
+    if(!req.body.uid){  // parameter check
+        return res.json({
+            "status": false,
+            "message": "invalid parameter"
+        });
+    }else{
+        estiModel.estiRandom(my.decrypted(req.body.uid) , function(err, user){
+
         });
     }
 };
