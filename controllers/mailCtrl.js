@@ -43,6 +43,9 @@ exports.mailSend = function(req, res){
                     });
                 },
                 function(receiver, mid, callback){  // push 전송
+                    if(!receiver.user_regid){
+                        receiver.user_regid = "no_regid";
+                    }
                     if(receiver.user_phone == 1){  // 0: 안드, 1: 아이폰
                         my.apns(receiver.user_regid, mid);
                     }else{

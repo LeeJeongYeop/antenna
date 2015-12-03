@@ -196,7 +196,7 @@ exports.otherList = function(uid, done){
         "SELECT user_idx, user_freq " +
         "FROM atn_user " +
         "WHERE user_freq IS NOT NULL AND user_idx != 21 AND user_idx != ? AND " +
-        "NOT IN (select bookmark_friend from atn_bookmark where bookmark_my = ?)";  // 21은 운영자
+        "user_idx NOT IN (SELECT bookmark_friend FROM atn_bookmark WHERE bookmark_my = ?)";  // 21은 운영자
     pool.query(sql, [uid, uid], function(err, rows){
         if(err){
             logger.error("Other List error:", err);
