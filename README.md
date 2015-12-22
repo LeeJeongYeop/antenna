@@ -25,3 +25,4 @@
 | Bookmark List |	GET	| /antenna/bookmark | complete | 15-11-22  |
 | Mail Send |	POST	| /antenna/mail | complete | 15-11-28  |
 | Mail View |	GET	| /antenna/mail/:mid | complete | 15-11-28  |
+| User Find |	GET	| /antenna/user/find/:freq | complete | 15-12-22  |
