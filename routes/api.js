@@ -17,6 +17,8 @@ exports.initApp = function(app){
     // USER
     app.route('/antenna/user')
         .post(userCtrl.join);
+    app.route('/antenna/user/find/:freq')
+        .get(userCtrl.find);
 
     // ESTIMATE
     app.route('/antenna/estimate')

@@ -142,3 +142,21 @@ exports.join = function(user_data, done){
         }
     });
 };
+
+/*******************
+ *  USER Find
+ ********************/
+exports.find = function(freq, done){
+    var sql =
+        "SELECT user_freq, user_nickname, user_song, user_video, user_comment " +
+        "FROM atn_user " +
+        "WHERE user_freq = ?";
+    pool.query(sql, freq, function(err, rows){
+        if(err){
+            logger.error("User frequency find error:", err);
+            done(err);
+        }else{
+            done(null, rows[0]);
+        }
+    });
+};

@@ -41,3 +41,33 @@ exports.join = function(req, res){
         });
     }
 };
+
+/*******************
+ *  USER Find
+ ********************/
+exports.find = function(req, res){
+    if(!req.params.freq) {  // parameter check
+        return res.json({
+            "status": false,
+            "message": "invalid parameter"
+        });
+    }else{
+        userModel.find(req.params.freq, function(err, user){
+            var status = false;
+            var message = "";
+            if(err){
+                message = "User frequency find error";
+            }else if(!user){
+                message = "No User";
+            }else{
+                status = true;
+                message = "success";
+            }
+            return res.json({
+                "status": status,
+                "message": message,
+                "data": user
+            });
+        });
+    }
+};
