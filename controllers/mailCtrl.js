@@ -18,6 +18,7 @@ exports.mailSend = function(req, res){
     }else{
         async.waterfall([
                 function(callback){  // receiver 유저 정보
+                    logger.info("req.body.freq:", req.body.freq);
                     mailModel.userInfo(req.body.freq, function(err, receiver){
                         if(err){
                             callback(err);
@@ -26,7 +27,16 @@ exports.mailSend = function(req, res){
                         }
                     });
                 },
-                function(receiver, callback){  // mail 저장
+                function(receiver, callback){  // sender 유저 정보
+                    mailModel.sendInfo(my.decrypted(req.headers.uid), function(err, sender){
+                        if(err){
+                            callback(err);
+                        }else{
+                            callback(null, sender, receiver);
+                        }
+                    });
+                },
+                function(sender, receiver, callback){  // mail 저장
                     var data = {
                         "mail_sender": my.decrypted(req.headers.uid),
                         "mail_receiver": receiver.user_idx,
@@ -38,16 +48,16 @@ exports.mailSend = function(req, res){
                         if(err){
                             callback(err);
                         }else{
-                            callback(null, receiver, mid);
+                            callback(null, sender, receiver, mid);
                         }
                     });
                 },
-                function(receiver, mid, callback){  // push 전송
+                function(sender, receiver, mid, callback){  // push 전송
                     if(!receiver.user_regid){
                         receiver.user_regid = "no_regid";
                     }
                     if(receiver.user_phone == 1){  // 0: 안드, 1: 아이폰
-                        my.apns(receiver.user_regid, mid);
+                        my.apns(receiver.user_regid, mid, sender);
                     }else{
                         my.gcm(receiver.user_regid, mid);
                     }
@@ -88,4 +98,24 @@ exports.mailView = function(req, res){
             }
         })
     });
+};
+
+/*******************
+ *  Mail Read Check
+ ********************/
+exports.mailReadCheck = function(req, res){
+    if(!req.headers.uid){  // parameter check
+        return res.json({
+            "status": false,
+            "message": "invalid parameter"
+        });
+    }else{
+        mailModel.mailReadCheck(my.decrypted(req.headers.uid), function(status, msg, mid){
+            return res.json({
+                "status": status,
+                "message": msg,
+                "data": mid
+            });
+        });
+    }
 };

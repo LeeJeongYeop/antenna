@@ -19,6 +19,8 @@ exports.initApp = function(app){
         .post(userCtrl.join);
     app.route('/antenna/user/find/:freq')
         .get(userCtrl.find);
+    app.route('/antenna/user/regid')
+        .put(userCtrl.regid);
 
     // ESTIMATE
     app.route('/antenna/estimate')
@@ -36,6 +38,7 @@ exports.initApp = function(app){
 
     // MAIL
     app.route('/antenna/mail')
+        .get(mailCtrl.mailReadCheck)
         .post(mailCtrl.mailSend);
     app.route('/antenna/mail/:mid')
         .get(mailCtrl.mailView);

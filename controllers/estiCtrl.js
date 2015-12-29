@@ -261,7 +261,6 @@ exports.estiRandom = function(req, res){
         });
     }else{
         estiModel.estiRandom(my.decrypted(req.body.uid) , function(err, user){
-
         });
     }
 };

@@ -71,3 +71,23 @@ exports.find = function(req, res){
         });
     }
 };
+
+/*******************
+ *  USER regId Change
+ ********************/
+exports.regid = function(req, res){
+    if(!req.headers.uid || !req.body.regid){  // parameter check
+        return res.json({
+            "status": false,
+            "message": "invalid parameter"
+        });
+    }else{
+        var data = [req.body.regid, my.decrypted(req.headers.uid)];
+        userModel.regid(data, function(status, msg){
+            return res.json({
+                "status": status,
+                "message": msg
+            });
+        });
+    }
+};

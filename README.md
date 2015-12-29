@@ -26,3 +26,5 @@
 | Mail Send |	POST	| /antenna/mail | complete | 15-11-28  |
 | Mail View |	GET	| /antenna/mail/:mid | complete | 15-11-28  |
 | User Find |	GET	| /antenna/user/find/:freq | complete | 15-12-22  |
+| Mail Read Check |	GET	| /antenna/mail | complete | 15-12-28  |
+| User RegId Change |	PUT	| /antenna/user/regid | complete | 15-12-29  |

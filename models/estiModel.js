@@ -195,8 +195,8 @@ exports.otherList = function(uid, done){
     var sql =
         "SELECT user_idx, user_freq " +
         "FROM atn_user " +
-        "WHERE user_freq IS NOT NULL AND user_idx != 21 AND user_idx != ? AND " +
-        "user_idx NOT IN (SELECT bookmark_friend FROM atn_bookmark WHERE bookmark_my = ?)";  // 21은 운영자
+        "WHERE user_freq IS NOT NULL AND user_idx != 1 AND user_idx != ? AND " +
+        "user_idx NOT IN (SELECT bookmark_friend FROM atn_bookmark WHERE bookmark_my = ?)";  // 1은 운영자
     pool.query(sql, [uid, uid], function(err, rows){
         if(err){
             logger.error("Other List error:", err);
@@ -243,6 +243,29 @@ exports.matchInsert = function(uid, other_idx, data, done){
                                     }
                                 });
                             },
+                            function(callback){  // 기존 매칭 결과 삭제
+                                var sql = "SELECT COUNT(*) cnt FROM atn_match WHERE match_other=? AND match_my=?";
+                                conn.query(sql, [other_idx, uid], function(err, rows){
+                                    if(err){
+                                        logger.error("Match Insert waterfall_3:", err);
+                                        callback(err);
+                                    }else{
+                                        if(rows[0].cnt){
+                                            var delete_sql = "DELETE FROM atn_match WHERE match_other=? AND match_my=?";
+                                            conn.query(delete_sql, [other_idx, uid], function(err, rows){
+                                                if(err){
+                                                    logger.error("Match Insert waterfall_4:", err);
+                                                    callback(err);
+                                                }else{
+                                                    callback(null);
+                                                }
+                                            });
+                                        }else{
+                                            callback(null);
+                                        }
+                                    }
+                                });
+                            },
                             function(callback){
                                 if(data.length == 0){  // 매칭 곡이 아예 없을때
                                     callback(null);
@@ -251,12 +274,12 @@ exports.matchInsert = function(uid, other_idx, data, done){
                                     logger.info("data:", [data]);
                                     conn.query(sql, [data], function(err, rows){
                                         if(err){
-                                            logger.error("Match Insert waterfall_3:", err);
+                                            logger.error("Match Insert waterfall_5:", err);
                                             callback(err);
                                         }else{
                                             if(rows.affectedRows == 0){
                                                 conn.rollback(function(){
-                                                    logger.error("Match Insert waterfall_4");
+                                                    logger.error("Match Insert waterfall_6");
                                                     done(false, "Match Insert DB Error");  // error done callback
                                                     conn.release();
                                                 });
@@ -406,6 +429,6 @@ exports.estiRandom = function(uid, done){
     var sql =
         "SELECT user_idx, user_freq " +
         "FROM atn_user " +
-        "WHERE user_freq IS NOT NULL AND user_idx != 21 AND user_idx != ? "+
+        "WHERE user_freq IS NOT NULL AND user_idx != 1 AND user_idx != ? "+
         "ORDER BY RAND() LIMIT 1";  // 10곡// 21은 운영자
 };

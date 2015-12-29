@@ -160,3 +160,23 @@ exports.find = function(freq, done){
         }
     });
 };
+
+/*******************
+ *  USER regId Change
+ ********************/
+exports.regid = function(data, done){
+    var sql ="UPDATE atn_user SET user_regid=? WHERE user_idx=?";
+    pool.query(sql, data, function(err, rows){
+        if(err){
+            logger.error("User regid change error:", err);
+            done(false, "regid change error");
+        }else{
+            if(rows.affectedRows != 1){
+                logger.error("User regid change DB error");
+                done(false, "User regid change DB Error");  // callback 없이 done
+            }else{
+                done(true, "success");
+            }
+        }
+    });
+};
