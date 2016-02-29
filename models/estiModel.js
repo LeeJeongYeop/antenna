@@ -15,7 +15,7 @@ exports.estiSongList = function(done){
         "SELECT DISTINCT(song_idx) song_idx, s.song_song, s.song_video, s.song_comment, u.user_freq, u.user_nickname " +
         "FROM atn_song s, atn_user u " +
         "WHERE s.song_user = u.user_idx " +
-        "ORDER BY RAND() LIMIT 10";  // 10곡
+        "ORDER BY RAND() LIMIT 5";  // 5곡
     pool.query(sql, function(err, rows){
         if(err){
             logger.error("Estimate Song Send Error: ", err);

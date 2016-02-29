@@ -11,12 +11,16 @@ var async = require('async');
  ********************/
 exports.join = function(req, res){
     if(!req.body.uid || !req.body.survey || !req.body.song ||
-        !req.body.video || !req.body.nickname || !req.body.phone || !req.body.regid){  // parameter check
+        !req.body.video || !req.body.nickname || !req.body.phone){  // parameter check
         return res.json({
             "status": false,
             "message": "invalid parameter"
         });
     }else{
+        var regid = "";  // 기본값: regid가 null이거나 받지 못한 경우
+        if(req.body.regid) {  // regid를 받았을 경우
+            regid = req.body.regid
+        }
         var user_data = {
             "user_freq": req.body.survey,
             "user_song": req.body.song,
@@ -24,7 +28,7 @@ exports.join = function(req, res){
             "user_nickname": req.body.nickname,
             "user_comment": req.body.comment,
             "user_phone": req.body.phone,
-            "user_regid": req.body.regid,
+            "user_regid": regid,
             "user_idx": my.decrypted(req.body.uid)
         };
         userModel.join(user_data, function(status, msg, user_freq){

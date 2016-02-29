@@ -18,10 +18,12 @@ require('./routes/api').initApp(app);
 
 // Server set
 var http = require('http');
-app.set('port', 30004); //30004번 포트로 지정
+//app.set('port', 30000);  // 30000~30002번 포트로 지정(Nginx Load Balancing used Reverse proxy)
+//app.set('port', 30001);  // 30000~30002번 포트로 지정(Nginx Load Balancing used Reverse proxy)
+app.set('port', 30002);  // 30000~30002번 포트로 지정(Nginx Load Balancing used Reverse proxy)
 var server = http.createServer(app);
 server.listen(app.get('port'));
-log.info('[Antenna] Application Listening on Port 30004 (80 with Nginx Proxy)');
+log.info('[Antenna] Application Listening on Port 30000 ~ 30002 (80 with Nginx Load Balancing used Reverse proxy)');
 
 
 module.exports = app;

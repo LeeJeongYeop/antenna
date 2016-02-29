@@ -53,15 +53,16 @@ exports.mailSend = function(req, res){
                     });
                 },
                 function(sender, receiver, mid, callback){  // push 전송
-                    if(!receiver.user_regid){
-                        receiver.user_regid = "no_regid";
-                    }
-                    if(receiver.user_phone == 1){  // 0: 안드, 1: 아이폰
-                        my.apns(receiver.user_regid, mid, sender);
+                    if(!receiver.user_regid || receiver.user_regid == ""){  // regid가 없을 시 push 패스
+                        callback(null);
                     }else{
-                        my.gcm(receiver.user_regid, mid);
+                        if(receiver.user_phone == 1){  // 0: 안드, 1: 아이폰
+                            my.apns(receiver.user_regid, mid, sender);
+                        }else{
+                            my.gcm(receiver.user_regid, mid);
+                        }
+                        callback(null);
                     }
-                    callback(null);  // push 실패시 처리해야함
                 }
             ],
             function(err){
